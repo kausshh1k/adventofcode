@@ -152,21 +152,30 @@ lines = '''...........................................751........501............
 # .664.598..'''
 
 lines = lines.split('\n')
-symPos = set()
 
+gearPos = set()
 for r in range(len(lines)):
-    for c, ch in enumerate(lines[r]):
-        if ch !='.' and ch not in '0123456789': symPos.add((r, c))
+    for c in range(len(lines[r])):
+        if lines[r][c] == '*': 
+            # print(r, c)
+            gearPos.add((r, c))
 
-def isValidNum(arr):
+# print(gearPos)
+
+def check(num, arr):
     for r, c in arr:
         for dr in [-1, 0, 1]:
             for dc in [-1, 0, 1]:
-                if (r + dr, c + dc) in symPos: return True
-    return False
+                if (r + dr, c + dc) in gearPos:
+                    count, val = gears.get((r + dr, c + dc), [0, 1])
+                    count += 1
+                    val *= num
+                    gears[(r + dr, c + dc)] = [count, val]
+                    return
 
+# print(lines)
 
-
+gears = {}
 num = ['', []]
 s = 0
 for r in range(len(lines)):
@@ -176,15 +185,18 @@ for r in range(len(lines)):
             num[1].append((r, c))
             
         else:
-            if num[0] and isValidNum(num[1]):
-                s += int(num[0])
-                if int(num[0]) < 0: print(num[0])
+            if num[0]: check(int(num[0]), num[1])
             num[0] = ''
             num[1] = []
             
-    if num[0] and isValidNum(num[1]):
-        s += int(num[0])
+    if num[0]: check(int(num[0]), num[1])
     num[0] = ''
     num[1] = []
+
+# print(gears)
+for key in gears:
+    count, val = gears[key]
+    if count == 2:
+        s += val
 
 print(s)
